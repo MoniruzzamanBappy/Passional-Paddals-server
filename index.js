@@ -22,6 +22,9 @@ async function run() {
     const productsCollection = client
       .db("Passional_Pedals")
       .collection("products");
+    const aboutsCollection = client
+      .db("Passional_Pedals")
+      .collection("abouts");
 
     // add products
     app.post("/products", async (req, res) => {
@@ -35,6 +38,13 @@ async function run() {
       const cursor = productsCollection.find(query);
       const products = await cursor.toArray();
       res.send(products);
+    });
+    // get about padals
+    app.get("/abouts", async (req, res) => {
+      const query = {};
+      const cursor = aboutsCollection.find(query);
+      const abouts = await cursor.toArray();
+      res.send(abouts);
     });
   } finally {
   }
