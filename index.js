@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
-const { MongoClient, ServerApiVersion, ObjectId  } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -22,9 +22,7 @@ async function run() {
     const productsCollection = client
       .db("Passional_Pedals")
       .collection("products");
-    const aboutsCollection = client
-      .db("Passional_Pedals")
-      .collection("abouts");
+    const aboutsCollection = client.db("Passional_Pedals").collection("abouts");
 
     // add products
     app.post("/products", async (req, res) => {
@@ -40,19 +38,38 @@ async function run() {
       res.send(products);
     });
     // delete one product
-    app.delete('/products/:_id', async (req, res)=>{
+    app.delete("/products/:_id", async (req, res) => {
       const _id = req.params._id;
-      const query = {_id: ObjectId(_id)}
+      const query = { _id: ObjectId(_id) };
       const result = await productsCollection.deleteOne(query);
       res.send(result);
-  });
-    // get one product
-    app.get('/products/:_id' , async (req, res)=>{
+    });
+    // update quantity
+    app.put("/products/:_id", async (req, res) => {
       const _id = req.params._id;
-      const query = {_id: ObjectId(_id)}
+      const query = { _id: ObjectId(_id) };
+      const updatedQuantity = req.body;
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          quantity: updatedQuantity.deliveredQuantity,
+        },
+      };
+      const result = await productsCollection.updateOne(
+        query,
+        updateDoc,
+        options
+      );
+
+      res.send(result);
+    });
+    // get one product
+    app.get("/products/:_id", async (req, res) => {
+      const _id = req.params._id;
+      const query = { _id: ObjectId(_id) };
       const product = await productsCollection.findOne(query);
       res.send(product);
-  });
+    });
     // get about padals
     app.get("/abouts", async (req, res) => {
       const query = {};
