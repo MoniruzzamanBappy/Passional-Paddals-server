@@ -30,13 +30,7 @@ async function run() {
       const result = await productsCollection.insertOne(newProduct);
       res.send(result);
     });
-    //   get all products
-    app.get("/products", async (req, res) => {
-      const query = {};
-      const cursor = productsCollection.find(query);
-      const products = await cursor.toArray();
-      res.send(products);
-    });
+
     // delete one product
     app.delete("/products/:_id", async (req, res) => {
       const _id = req.params._id;
@@ -62,6 +56,28 @@ async function run() {
       );
 
       res.send(result);
+    });
+    //   get all products
+    // app.get("/products", async (req, res) => {
+    //   const query = {};
+    //   const cursor = productsCollection.find(query);
+    //   const products = await cursor.toArray();
+    //   res.send(products);
+    // });
+    // get logged user data
+    app.get("/products", async (req, res) => {
+      const email = req.query.email;
+      if (email) {
+        const query = { email: email };
+        const cursor = productsCollection.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+      } else {
+        const query = {};
+        const cursor = productsCollection.find(query);
+        const products = await cursor.toArray();
+        res.send(products);
+      }
     });
     // get one product
     app.get("/products/:_id", async (req, res) => {
