@@ -23,6 +23,7 @@ async function run() {
       .db("Passional_Pedals")
       .collection("products");
     const aboutsCollection = client.db("Passional_Pedals").collection("abouts");
+    const featuresCollection = client.db("Passional_Pedals").collection("features");
 
     // add products
     app.post("/products", async (req, res) => {
@@ -54,16 +55,16 @@ async function run() {
         updateDoc,
         options
       );
-
-      res.send(result);
+      const result1 = await productsCollection.findOne(query)
+      res.send(result1);
     });
-    //   get all products
-    // app.get("/products", async (req, res) => {
-    //   const query = {};
-    //   const cursor = productsCollection.find(query);
-    //   const products = await cursor.toArray();
-    //   res.send(products);
-    // });
+      // get all features
+    app.get("/features", async (req, res) => {
+      const query = {};
+      const cursor = featuresCollection.find(query);
+      const features = await cursor.toArray();
+      res.send(features);
+    });
     // get logged user data
     app.get("/products", async (req, res) => {
       const email = req.query.email;
