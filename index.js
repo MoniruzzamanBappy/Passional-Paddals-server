@@ -117,19 +117,3 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log("listening to port: ", port);
 });
-
-function identifyJWT(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).send({ message: "unauthorized access" });
-  }
-  const token = authHeader.split(" ")[1];
-  jwt.verify(token, precess.env.TOKEN, (err, decoded) => {
-    if (err) {
-      return res.status(403).send({ message: "authorized forbidden" });
-    }
-    req.decoded = decoded;
-
-    next();
-  });
-}
