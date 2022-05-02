@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
+
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const app = express();
@@ -23,7 +25,9 @@ async function run() {
       .db("Passional_Pedals")
       .collection("products");
     const aboutsCollection = client.db("Passional_Pedals").collection("abouts");
-    const featuresCollection = client.db("Passional_Pedals").collection("features");
+    const featuresCollection = client
+      .db("Passional_Pedals")
+      .collection("features");
 
     // add products
     app.post("/products", async (req, res) => {
@@ -55,10 +59,10 @@ async function run() {
         updateDoc,
         options
       );
-      const result1 = await productsCollection.findOne(query)
+      const result1 = await productsCollection.findOne(query);
       res.send(result1);
     });
-      // get all features
+    // get all features
     app.get("/features", async (req, res) => {
       const query = {};
       const cursor = featuresCollection.find(query);
@@ -80,6 +84,12 @@ async function run() {
         res.send(products);
       }
     });
+    // login auth
+    app.post("/login" , async (req, res)=>{
+      const user = req.body;
+      const token = jwt.sign(user, process.env.TOKEN, {expiresIn: '2d'})
+      res.send({token});
+    })
     // get one product
     app.get("/products/:_id", async (req, res) => {
       const _id = req.params._id;
@@ -107,3 +117,19 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log("listening to port: ", port);
 });
+
+function identifyJWT(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).send({ message: "unauthorized access" });
+  }
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, precess.env.TOKEN, (err, decoded) => {
+    if (err) {
+      return res.status(403).send({ message: "authorized forbidden" });
+    }
+    req.decoded = decoded;
+
+    next();
+  });
+}
